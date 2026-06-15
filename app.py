@@ -3,7 +3,7 @@ import json
 import requests
 import time
 
-st.set_page_page_config(page_title="EPMS Load Test Portal", layout="centered")
+st.set_page_config(page_title="EPMS Load Test Portal", layout="centered")
 st.title("🚀 EPMS Authentication Load Test Portal")
 st.write("Generate performance reports independently without running terminal scripts.")
 

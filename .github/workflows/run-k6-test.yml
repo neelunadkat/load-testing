@@ -1,0 +1,41 @@
+name: Streamlit Automated k6 Trigger
+
+on:
+  repository_dispatch:
+    types: [streamlit_trigger]
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create Dynamic configurations
+        run: |
+          # Overwrites local options and injects user inputs dynamically
+          echo '${{ github.event.client_payload.users_json }}' > users.json
+          
+          # Adjust script options dynamically based on form variables
+          sed -i 's/vus: .*/vus: ${{ github.event.client_payload.vus }},/' login-test.js
+          sed -i 's/duration: .*/duration: "${{ github.event.client_payload.duration }}",/' login-test.js
+
+      - name: Setup k6 Load Engine
+        uses: grafana/setup-k6-action@v1
+
+      - name: Execute Performance Script
+        run: |
+          k6 run login-test.js
+
+      - name: Find and Rename Generated HTML Report
+        run: |
+          # Locates the newly formatted timestamp report file
+          REPORT_FILE=$(ls summary_*.html | head -n 1)
+          cp "$REPORT_FILE" final_summary.html
+
+      - name: Upload Report to Temporary Artifact Repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-report
+          path: final_summary.html
+          retention-days: 1

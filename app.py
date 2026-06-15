@@ -8,8 +8,9 @@ st.title("🚀 EPMS Authentication Load Test Portal")
 st.write("Generate real k6 performance reports independently without running terminal scripts.")
 
 # Global Configuration Parameters - Update these to point to your repository
-GITHUB_OWNER = "neelunadkat"  # Your GitHub Username
-GITHUB_REPO = "epms-load-test"  # Your GitHub Repository Name
+GITHUB_OWNER = "neelunadkat"     # Your exact username visible in the repo URL
+GITHUB_REPO = "load-testing"     # From your screenshot path: /mount/src/load-testing/
+
 
 # Web Form Fields
 vus = st.number_input("Enter Number of Virtual Users (VUs)", min_value=1, max_value=50, value=10)

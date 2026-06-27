@@ -42,7 +42,9 @@ export default function () {
   };
 
   const response = http.post(
-    "https://epms-app.encircledev.com/api/v1/auth/login",
+    "https://one.encircletechnologies.com/api/v1/auth/login", //live
+    //"https://epms-app.encircledev.com/api/v1/auth/login", //Production
+    //"https://epms-app-staging.encircledev.com/api/v1/auth/login", //Staging
     payload,
     params
   );
@@ -88,9 +90,12 @@ function getTimestampFilename() {
 }
 
 export function handleSummary(data) {
-  const fileName = getTimestampFilename();
+  const rawFileName = getTimestampFilename();
   
-  console.log(`\n💾 Exporting user-friendly summary report to: ${fileName}\n`);
+  // FIXED: Prepended 'Report/' to ensure it gets written directly into that subdirectory folder
+  const filePath = `Report/${rawFileName}`;
+  
+  console.log(`\n💾 Exporting user-friendly summary report to: ${filePath}\n`);
 
   const configuredVUs = options.vus || 0;
   const totalUserPoolCount = users.length;
@@ -99,7 +104,7 @@ export function handleSummary(data) {
   const reportOptions = {
     title: "EPMS Authentication Load Test Report",
     customData: {
-      "Target Environment": "Staging (EncircleDev)",
+      "Target Environment": "Live (One Encircle)",
       "Total Virtual Users (VUs)": `${configuredVUs} VUs Parallel`,
       "Total Users Pool Tested": `${totalUserPoolCount} Accounts Available`,
       "Metric Table Display Units": "All duration numbers are calculated in Milliseconds (ms)"
@@ -107,9 +112,11 @@ export function handleSummary(data) {
   };
 
   const reportOutputs = {};
-  reportOutputs[fileName] = htmlReport(data, reportOptions); 
   
-  // FIXED: Replaced remote textSummary with k6's built-in stringifier fallback to work 100% offline
+  // Uses the folder path variable key to write into the correct directory location
+  reportOutputs[filePath] = htmlReport(data, reportOptions); 
+  
+  // Replaced remote textSummary with k6's built-in stringifier fallback to work 100% offline
   reportOutputs["stdout"] = JSON.stringify(data.metrics, null, 2); 
 
   return reportOutputs;
